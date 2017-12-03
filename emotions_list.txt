@@ -1,8 +1,4 @@
-Happy: Hope, Joy, Gratitude, Satisfaction
-Love: Admiration, Lust
-Sadness: Lonely, Pity
-Fear: Nervous, Anxious, Distress
-Anger: Resentment, Hate, Disgust, Frustration
-Disappointment: Shame, Reproach, Remorse
-Pride: Gloating, Greed, Jealous
-Surprise: Excited, Relief, Startlecl
+Happy: happy
+Love: love, lust
+Sad: sad
+hate: hate
