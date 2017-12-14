@@ -126,6 +126,37 @@ Word2vec is a distributional approach to word representations using the values i
 \section{Algorithm Design}
 
 \section{Experimental Results}
+Testing and evaluating our music recommender system was a two-step process. First, the accuracy of the model's song classification was evaluated using human surveys on a small set of test songs. The algorithm was then run on the entire corpus of song lyrics and displayed with histograms to see what insight it might provide on the emotional tendencies of music genres.
+
+\subsection{Song Emotion Evaluation}
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{test_cos.png}
+\caption{Figure 1(a): Song cosine similarity to emotion class}
+\label{fig:digraph}
+\end{figure}
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{test_vote.png}
+\caption{Figure 1(b): Song emotion classified by Amazon Mechanical Turk survey}
+\label{fig:digraph}
+\end{figure}
+Amazon Mechanical Turk was used to evaluate our music recommender model's ability to classify the primary emotion displayed by a song. Using a set of fifteen example songs from across multiple genres, our music recommender algorithm was used to calculate the cosine similarity of each song to the four emotion categories. At the same time, a group of one hundred Turkers were given the lyrics of each song without song title or artist and asked to identify which of the four emotion classes it most closely resembled. The results of both tests can be seen in figures 1(a) and 1(b), respectively. The algorithm achieved an accuracy of .66, ranking the same emotion class identified by the Turkers as having the greatest cosine similarity to the test song in ten out of fifteen instances. Were more time and work available to identify a corpus of words that do not pertain to any particular emotion, as such having a similar cosine similarity to all emotion classifications, the accuracy of the model should rise with the removal of noise words.
+
+\subsection{Genre Classification}
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=3.125in]{metal_hate.png}
+\caption{Figer 2(a): Distribution of cosine similarites to "Hate" emotion class for the Metal genre}
+\label{fig:digraph}
+\end{figure}
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=3.125in]{pop_hate.png}
+\caption{Figer 2(b): Distribution of cosine similarites to "Hate" emotion class for the Pop genre}
+\label{fig:digraph}
+\end{figure}
+Using the song lyric corpus obtained from Kaggle\cite{a14}, the song emotion of twenty thousand songs from each genre were run through our algorithm to calculate their cosine similarity to each emotion classification. Using these cosine similarities, four histograms were made for each genre, showing their distribution of similarities across each of the four emotion classes. Above all, the graphs show that songs within any given genre vary wildly in regards to which emotion they portray. At times, genres' cosine similarities to an emotion are evenly distributed across an emotion class and at others the cosine similarities are split between high and low similarity to an emotion class. On the other hand, some of the histograms do give insight into overall trends within a genre. One such trend can be seen in figures 2(a) and 2(b). The histograms clearly show that the Metal genre trends towards the hate/anger emotion class, while at the same time the Pop songs tend to have a low cosine similarity the the hate/anger classification. While emotional trends with broad genres are limited, the set of histograms produced by our music recommender system do provide insight into how genres relate to different emotions, whether they are split, evenly spread, similar, or dissimilar to particular emotion classes. The full set of forty histograms, ten genres with four emotion classes, can be accessed on our project's github page (https://github.com/BGoldman1989/song-recommender/).
 
 \section{Conclusion and Future Work}
 Music recommender systems make listening to streaming music easier by automatically generating playlist for listeners based on their own listening history or the histories of other listeners.  While many music recommenders use historical listening patterns to generate playlists, we have proposed a music recommender system that uses emotional keywords to discover correlation between songs to generate playlists.  We expect that emotional playlists will improve the listener experience by including songs that feature emotions similar to what the listener wants to hear at any given moment.  Our algorithm generated lists of words that are closely associated with each emotional keyword, but we discovered that the lists of emotional words included songs that were both positively and negatively associated with each income.
