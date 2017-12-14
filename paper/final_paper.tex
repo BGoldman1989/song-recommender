@@ -1,0 +1,139 @@
+%
+% Author kit for UCSC graduate classes in computer systems.
+%
+% Author guidelines and sample document in LaTeX 2e.
+%
+
+\documentclass[10pt,twocolumn]{article}
+
+% Use the USENIX style file
+\usepackage{usenix}
+
+% Here are a bunch of useful packages
+\usepackage{cite}
+%\usepackage[]{biblatex}
+\usepackage{xspace,verbatim}
+\usepackage{subfig}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{float}
+\usepackage{listings}
+\usepackage[hyphens]{url}
+
+% subfig default captions are too small.  This fixes it.
+\captionsetup[subfloat]{font=normalsize}
+
+% Redefine the percentage of the page that can be used for floats (figures,
+% tables, etc.)
+\renewcommand\floatpagefraction{.9}
+\renewcommand\dblfloatpagefraction{.9}
+\renewcommand\topfraction{.9}
+\renewcommand\dbltopfraction{.9}
+\renewcommand\bottomfraction{.9}
+\renewcommand\textfraction{.1}
+\setcounter{totalnumber}{10}
+\setcounter{topnumber}{10}
+\setcounter{dbltopnumber}{10}
+\setcounter{bottomnumber}{10}
+
+% Don't allow widows or clubs - single lines at the start/end of a column
+\widowpenalty=10000
+\clubpenalty=10000
+
+\newcommand{\latex}{\LaTeX\xspace}
+\newcommand{\unix}{\textsc{Unix}\xspace}
+
+\pagestyle{plain}
+
+%------------------------------------------------------------------------- 
+\begin{document}
+
+\title{A Music Recommender System Based on Emotion}
+
+\author{
+{\rm Patrick Cudahy} \\
+\textit{pcudahy@ucsc.edu}
+\and
+{\rm James Byron} \\
+\textit{jbyron@ucsc.edu}
+\and
+{\rm Brady Goldman} \\
+\textit{btgoldma@ucsc.edu}
+}
+
+\maketitle
+
+\begin{abstract}
+The rise of the internet has accompanied an increasing demand for entertainment on demand, including digital music.  To satisfy the demand for instant access to music, online music streaming services offer huge song libraries for listeners to enjoy.  The rising popularity of online music streaming services has also led to competition between different streaming services to keep listeners' attention, and to accomplish this, streaming services use recommender systems to automatically generate personalized playlists for each music listener.  Currently recommender systems utilize each user's listening history or the listening habits of similar users to generate lists of novel music to play.  Users may, however, wish to listen to music that expresses a particular emotional motif, and current recommender systems may not effectively serve this purpose.  We propose a recommender system that generates recommendations for music based on the emotions that a listener selects.  We use word2vec to generate lists of words that are typically associated with different emotions.  We use the list of emotionally correlated words to discover songs that have a high degree of cosine similarity with them using doc2vec.  We describe our model and evaluate its performance using crowd-sourced classification of the emotions expressed in song lyrics.
+\end{abstract}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=3.125in]{1.png}
+\caption{Example: Patric's graphics go here.  This graphic is exported in the PNG format.  Place the caption for the graphic here.}
+\label{fig:digraph}
+\end{figure}
+
+\begin{table}
+\begin{center}
+ \begin{tabular}{ | c | c | } 
+ \hline
+\textbf{Emotion} & \textbf{Associated Works} \\ [0.5ex] 
+ \hline
+Love & A list goes here \\ 
+ \hline
+Hate & A list goes here \\ 
+ \hline
+Happy & A list goes here \\ 
+ \hline
+Sad & A list goes here \\ 
+ \hline
+\end{tabular}
+\caption{Each emotion correlates with a list of words in the corpus of song lyrics.}
+\end{center}
+\end{table}
+
+\section{Introduction}
+Music can make an emotional connection with listeners.  Music typifies graduation ceremonies, weddings, funerals, religious ceremonies, and political inaugurations with the fanfare and consequence that they typify.  In more casual settings, music sets the mood in restaurants and grocery stores, provides emotional signaling in motion pictures and commercials, and accompanies drivers during long voyages to ward off boredom.  Music carries emotional signals in its tones and lyrics that listeners enjoy and resonate with.
+
+The availability of digital music through the internet has enabled fans to discover and enjoy both familiar and novel types of music.  While services like iTunes \cite{a16} allow customers to purchase their music online, other business models for delivering music to listeners have allowed customers to enjoy their favorite songs and easily discover new songs and artists.
+
+Digital music streaming services like Pandora \cite{a12} and Spotify \cite{a13} offer a virtually unlimited library of music to subscribers who pay for the service either through a monthly fee or advertisements.  Subscribers enjoy the option to listen to any music genre without having to buy each song or album, and the large music library ensures that listeners can find music for any occasion.  The streaming services profit from listeners who remain paying subscribers or who continue to listen to advertisements and therefore each service seeks to capture and retain every music listener's attention.  With the goal of improving listener experience increasing subscriber retention, music streaming services automatically create playlists to make continuous listening convenient, effortless, and suitable for each user's listening preferences.
+
+Music streaming services like Pandora and Spotify construct playlists of recommended music based on each user's listening preferences.  The music recommender system within each streaming service offers music that is typically similar to the songs and artists that each user has played before.  The streaming service may analyze a user's listening history to identify similar songs when dynamically constructing a user-specific playlist.  Alternatively, each user's listening history may be compared with other users to suggest songs for the playlist that similar users have enjoyed.  Both strategies for recommending music rely on the preferences of listeners as conveyed through their listening patterns and history.  Current recommender systems offer the benefit of presenting diverse music to each listener, but user historical and pattern-based recommender systems do not include the emotional state of the listener as a selection criterion.
+
+Musical interests are personal and also subject to change with different moods and over time.  Therefore, music recommender systems based purely on user history do not suit every important use case for music recommender systems.  We propose a solution to this problem with a music recommender that creates dynamic playlists based on the mood of the lyrics to music.  Our recommender system identifies songs with the most similarity to the user's current mood.  We have identified several core emotions that typify the feelings expressed in many popular songs, and we extract emotional keywords from a corpus of song lyrics that correspond to each emotion.  To initially determine a listener's mood, our model may utilize either a user-provided emotional keyword or the emotion keyword that corresponds to a song that the user has selected to play.
+
+In the following sections we discuss related work and background to our approach, the database of song lyrics that we use, our model implementation, and our experimental results.
+
+\section{Data Description}
+To design and evaluate our model, we used a publically available list of lyrics available from Kaggle. \cite{a14}  The list was generated by crawling the MetroLyrics catalog of music lyrics. \cite{a15}  The dataset includes lyrics for approximately 380,000 popular songs in English.  The dataset includes fields for song title, release year, artist, genre, and lyrics. We prepared our dataset by filtering stop words and removing instrumental songs that have no lyrics.  We also exclude songs that have lyrics of fewer than 20 words since our model relies on word vectors that are at least 20 words long.
+
+\section{Related Work}
+\subsection{Emotion in Music Recommender Systems}
+Music recommender systems are a challenging area of research.  Especially challenging are the goals of recommending music to new users to a music streaming service, predicting which users will enjoy a new song or album when it is added to the streaming library, and the evaluation of the music recommender system. \cite{a1}  Music recommender systems are different than film recommenders in several ways.  Songs are typically shorter than a film, and a listener will often listen to many songs consecutively but only one film at a time.  Also, songs have a high emotionality compared with films in general.  Finally, users are sometimes willing to accept repeated recommendations to songs, but they are less likely to enjoy watching the same film repeatedly.  Music recommenders must respond to users' sporadic inputs of expressing like and dislike for music by playing or skipping songs, and the music recommender must constantly present music that is both novel and sufficiently diverse to attract the listener's continued attention.  User mood, location, and activity often affect the listener's perception of appropriateness for a particular song, and the quality of a music recommender should reflect its ability to respond to the user implicitly.
+
+Recent work has explored techniques to include musical emotion as a factor in recommender systems.  Musical key, tempo, and melody characterize emotional features of music.  Film music, which closely follows the dialogue in the film, reflects the emotion of the scene.  Previous work has demonstrated a technique to learn the musical features that reflect the emotions communicated in film text and apply those features to other music. \cite{a2}  Other research used machine learning to discover correlations between musical lyrics and emotions. \cite{a3}  A psychological linguistic dictionary assisted the machine learning algorithm in discovering the emotional connotation of English words.  This approach differs from others in that it extracts emotions from text using an expert-defined psychological linguistic model rather than syntactical text analysis.
+
+\subsection{Word2Vec and Doc2vec}
+The Word2vec algorithm discovers semantic analysis tool for discovering relationships between words.  It converts words and word contexts into vectors \cite{a4,a5,a6}, and the vectors resemble a shallow neural network, the smaller number of features compared with a neural network allows Word2vec to require less memory and computational power than a neural network.  To create the context for each word, Word2vec uses either a bag-of-words (BOW) or skip-gram model.  The BOW model is suitable for predicting a central word based on its context of words, and the skip-gram is optimal for predicting a context of words based on a central word.   Word vector representations can also be added or subtracted together to combine different concepts.  For example, the vector representations for king, man, and queen hold that king - man = queen.
+
+Doc2vec is an extension of Word2vec to utilize an entire paragraph or document as the context window for each word. \cite{a7,a8}  Doc2vec predicts words in a document context based on a word.  Doc2vec has a lower error rate than Word2vec does in some cases.
+
+\subsection{Other Approaches}
+Word2vec is a distributional approach to word representations using the values in the vectors that correspond to the distribution of the probability that two words appear in the same context.  An alternative to the distributional approach is the counting approach, which creates a sparse matrix showing how many times each word appears in the context of every other word in the corpus.  The counting approach requires more memory than the distributional approach because it uses a large sparse matrix.  Initial results with Word2vec and Doc2vec showed that their performance was better than the older counting approaches like Latent Semantic Analysis (LSA), but recent work indicates that LSA may be more effective than Word2vec on small corpora. \cite{a10}  Small corpora also require smaller co-occurrence matrices, which makes LSA still more attractive in such scenarios.  Other work suggests that parameter tuning can reduce or eliminate any performance differences between different analysis techniques. \cite{a11}
+  
+\section{Algorithm Design}
+
+\section{Experimental Results}
+
+\section{Conclusion and Future Work}
+Music recommender systems make listening to streaming music easier by automatically generating playlist for listeners based on their own listening history or the histories of other listeners.  While many music recommenders use historical listening patterns to generate playlists, we have proposed a music recommender system that uses emotional keywords to discover correlation between songs to generate playlists.  We expect that emotional playlists will improve the listener experience by including songs that feature emotions similar to what the listener wants to hear at any given moment.  Our algorithm generated lists of words that are closely associated with each emotional keyword, but we discovered that the lists of emotional words included songs that were both positively and negatively associated with each income.
+
+In future work, we plan to further refine our algorithm by implementing techniques for excluding songs that exhibit an emotion that is the opposite of what the user wants to hear.  We plan to explore the benefit of using latent semantic analysis to discover correlations between lists of emotional works and individual songs.  We also hope to write and submit a conference paper detailing our algorithm and our experimental results.
+
+
+\bibliographystyle{abbrv}
+\bibliography{references}
+
+\end{document}\grid
