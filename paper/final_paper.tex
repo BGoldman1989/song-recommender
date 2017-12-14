@@ -80,13 +80,13 @@ The rise of the internet has accompanied an increasing demand for entertainment 
  \hline
 \textbf{Emotion} & \textbf{Associated Works} \\ [0.5ex] 
  \hline
-Love & A list goes here \\ 
+Love & Love, Lust \\ 
  \hline
-Hate & A list goes here \\ 
+Hate & Hate, Anger \\ 
  \hline
-Happy & A list goes here \\ 
+Happy & Happy \\ 
  \hline
-Sad & A list goes here \\ 
+Sad & Sad \\ 
  \hline
 \end{tabular}
 \caption{Each emotion correlates with a list of words in the corpus of song lyrics.}
@@ -116,14 +116,31 @@ Music recommender systems are a challenging area of research.  Especially challe
 Recent work has explored techniques to include musical emotion as a factor in recommender systems.  Musical key, tempo, and melody characterize emotional features of music.  Film music, which closely follows the dialogue in the film, reflects the emotion of the scene.  Previous work has demonstrated a technique to learn the musical features that reflect the emotions communicated in film text and apply those features to other music. \cite{a2}  Other research used machine learning to discover correlations between musical lyrics and emotions. \cite{a3}  A psychological linguistic dictionary assisted the machine learning algorithm in discovering the emotional connotation of English words.  This approach differs from others in that it extracts emotions from text using an expert-defined psychological linguistic model rather than syntactical text analysis.
 
 \subsection{Word2Vec and Doc2vec}
-The Word2vec algorithm discovers semantic analysis tool for discovering relationships between words.  It converts words and word contexts into vectors \cite{a4,a5,a6}, and the vectors resemble a shallow neural network, the smaller number of features compared with a neural network allows Word2vec to require less memory and computational power than a neural network.  To create the context for each word, Word2vec uses either a bag-of-words (BOW) or skip-gram model.  The BOW model is suitable for predicting a central word based on its context of words, and the skip-gram is optimal for predicting a context of words based on a central word.   Word vector representations can also be added or subtracted together to combine different concepts.  For example, the vector representations for king, man, and queen hold that king - man = queen.
+The Word2vec algorithm discovers semantic analysis tool for discovering relationships between words.  It converts words and word contexts into vectors \cite{a4,a5,a6}, and the vectors resemble a shallow neural network, the smaller number of features compared with a neural network allows Word2vec to require less memory and computational power than a neural network.  To create the context for each word, Word2vec uses either a continuous bag-of-words (CBOW) or skip-gram model.  The CBOW model is suitable for predicting a central word based on its context of words, and the skip-gram is optimal for predicting a context of words based on a central word.   Word vector representations can also be added or subtracted together to combine different concepts.  For example, the vector representations for king, man, and queen hold that king - man = queen.
 
 Doc2vec is an extension of Word2vec to utilize an entire paragraph or document as the context window for each word. \cite{a7,a8}  Doc2vec predicts words in a document context based on a word.  Doc2vec has a lower error rate than Word2vec does in some cases.
 
 \subsection{Other Approaches}
 Word2vec is a distributional approach to word representations using the values in the vectors that correspond to the distribution of the probability that two words appear in the same context.  An alternative to the distributional approach is the counting approach, which creates a sparse matrix showing how many times each word appears in the context of every other word in the corpus.  The counting approach requires more memory than the distributional approach because it uses a large sparse matrix.  Initial results with Word2vec and Doc2vec showed that their performance was better than the older counting approaches like Latent Semantic Analysis (LSA), but recent work indicates that LSA may be more effective than Word2vec on small corpora. \cite{a10}  Small corpora also require smaller co-occurrence matrices, which makes LSA still more attractive in such scenarios.  Other work suggests that parameter tuning can reduce or eliminate any performance differences between different analysis techniques. \cite{a11}
   
-\section{Algorithm Design}
+\section{Implementation}
+\subsection{Preprocessing}
+
+Song lyric records from the MetroLyrics dataset were first filtered to remove songs with an empty genre attribute or genres labeled "Not Available" or "Other" as well as an empty lyrics section.  Each set of song lyrics were then tokenized by word using the TweetTokenizer model from NLTK.  We chose this tokenizer over NLTK's default tokenizer because it does not split contractions.  We then used stratified sampling to sample 2000 song lyrics from each genre, bringing the total sample size to 20000 lyrics.  
+
+\subsection{Doc2Vec Generation}
+
+We first selected seed words for each of the emotional categories we chose for use in generating a list of 50 most similar wordsfor each category (Table 1).  We chose these emotional categories because each one has a distinct, respective opposite that we can use as negative examples.  The seed words were chosen based on minimizing the appearance of noise within the generated similar word list.
+
+To generate the word lists, we used a pre-trained Word2Vec model taken from the Google News dataset, which contains a 300-dimensional vector representation of 3 million different words and phrases \cite{a6}.  For each emotional category, we generated a list of 50 most similar words based on cosine similarity using the seed words of the emotional category as positive examples and the seed words of its opposite emotional category as negative examples.  We used Gensim's \texttt{most\_similar()} function to perform this task.  We subsequently used the word vectors of the similar words to create corresponding Doc2Vecs for each emotional category.
+
+Because we do not care about the position of each word relative to one another in the collection of related words to an emotion category, we simply take the bag-of-words approach to our Doc2Vec design by creating an averaged vector for all word2vec occurrences in the document.  We use this approach both for creating vectors for the emotion categories and each song lyric.
+
+\subsection{Measurement}
+
+After normalizing the vectors for emotional categories and song lyrics, we measured similarity between each song lyric document vector and emotional category vector by use of cosine similarity.
+
+\subsection{Mechanical Turk}
 
 \section{Experimental Results}
 Testing and evaluating our music recommender system was a two-step process. First, the accuracy of the model's song classification was evaluated using human surveys on a small set of test songs. The algorithm was then run on the entire corpus of song lyrics and displayed with histograms to see what insight it might provide on the emotional tendencies of music genres.
@@ -153,7 +170,7 @@ Amazon Mechanical Turk was used to evaluate our music recommender model's abilit
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=3.125in]{pop_hate.png}
-\caption{Figer 2(b): Distribution of cosine similarites to "Hate" emotion class for the Pop genre}
+\caption{Figure 2(b): Distribution of cosine similarites to "Hate" emotion class for the Pop genre}
 \label{fig:digraph}
 \end{figure}
 Using the song lyric corpus obtained from Kaggle\cite{a14}, the song emotion of twenty thousand songs from each genre were run through our algorithm to calculate their cosine similarity to each emotion classification. Using these cosine similarities, four histograms were made for each genre, showing their distribution of similarities across each of the four emotion classes. Above all, the graphs show that songs within any given genre vary wildly in regards to which emotion they portray. At times, genres' cosine similarities to an emotion are evenly distributed across an emotion class and at others the cosine similarities are split between high and low similarity to an emotion class. On the other hand, some of the histograms do give insight into overall trends within a genre. One such trend can be seen in figures 2(a) and 2(b). The histograms clearly show that the Metal genre trends towards the hate/anger emotion class, while at the same time the Pop songs tend to have a low cosine similarity the the hate/anger classification. While emotional trends with broad genres are limited, the set of histograms produced by our music recommender system do provide insight into how genres relate to different emotions, whether they are split, evenly spread, similar, or dissimilar to particular emotion classes. The full set of forty histograms, ten genres with four emotion classes, can be accessed on our project's github page (https://github.com/BGoldman1989/song-recommender/).
