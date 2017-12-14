@@ -67,32 +67,6 @@
 The rise of the internet has accompanied an increasing demand for entertainment on demand, including digital music.  To satisfy the demand for instant access to music, online music streaming services offer huge song libraries for listeners to enjoy.  The rising popularity of online music streaming services has also led to competition between different streaming services to keep listeners' attention, and to accomplish this, streaming services use recommender systems to automatically generate personalized playlists for each music listener.  Currently recommender systems utilize each user's listening history or the listening habits of similar users to generate lists of novel music to play.  Users may, however, wish to listen to music that expresses a particular emotional motif, and current recommender systems may not effectively serve this purpose.  We propose a recommender system that generates recommendations for music based on the emotions that a listener selects.  We use word2vec to generate lists of words that are typically associated with different emotions.  We use the list of emotionally correlated words to discover songs that have a high degree of cosine similarity with them using doc2vec.  We describe our model and evaluate its performance using crowd-sourced classification of the emotions expressed in song lyrics.
 \end{abstract}
 
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=3.125in]{1.png}
-\caption{Example: Patric's graphics go here.  This graphic is exported in the PNG format.  Place the caption for the graphic here.}
-\label{fig:digraph}
-\end{figure}
-
-\begin{table}
-\begin{center}
- \begin{tabular}{ | c | c | } 
- \hline
-\textbf{Emotion} & \textbf{Associated Works} \\ [0.5ex] 
- \hline
-Love & Love, Lust \\ 
- \hline
-Hate & Hate, Anger \\ 
- \hline
-Happy & Happy \\ 
- \hline
-Sad & Sad \\ 
- \hline
-\end{tabular}
-\caption{Each emotion correlates with a list of words in the corpus of song lyrics.}
-\end{center}
-\end{table}
-
 \section{Introduction}
 Music can make an emotional connection with listeners.  Music typifies graduation ceremonies, weddings, funerals, religious ceremonies, and political inaugurations with the fanfare and consequence that they typify.  In more casual settings, music sets the mood in restaurants and grocery stores, provides emotional signaling in motion pictures and commercials, and accompanies drivers during long voyages to ward off boredom.  Music carries emotional signals in its tones and lyrics that listeners enjoy and resonate with.
 
@@ -124,6 +98,27 @@ Doc2vec is an extension of Word2vec to utilize an entire paragraph or document a
 Word2vec is a distributional approach to word representations using the values in the vectors that correspond to the distribution of the probability that two words appear in the same context.  An alternative to the distributional approach is the counting approach, which creates a sparse matrix showing how many times each word appears in the context of every other word in the corpus.  The counting approach requires more memory than the distributional approach because it uses a large sparse matrix.  Initial results with Word2vec and Doc2vec showed that their performance was better than the older counting approaches like Latent Semantic Analysis (LSA), but recent work indicates that LSA may be more effective than Word2vec on small corpora. \cite{a10}  Small corpora also require smaller co-occurrence matrices, which makes LSA still more attractive in such scenarios.  Other work suggests that parameter tuning can reduce or eliminate any performance differences between different analysis techniques. \cite{a11}
   
 \section{Implementation}
+
+
+\begin{table}[!hb]
+\begin{center}
+ \begin{tabular}{ | c | c | } 
+ \hline
+\textbf{Emotion} & \textbf{Associated Works} \\ [0.5ex] 
+ \hline
+Love & Love, Lust \\ 
+ \hline
+Hate & Hate, Anger \\ 
+ \hline
+Happy & Happy \\ 
+ \hline
+Sad & Sad \\ 
+ \hline
+\end{tabular}
+\caption{Each emotion correlates with a list of words in the corpus of song lyrics.}
+\end{center}
+\end{table}
+
 \subsection{Preprocessing}
 
 Song lyric records from the MetroLyrics dataset were first filtered to remove songs with an empty genre attribute or genres labeled "Not Available" or "Other" as well as an empty lyrics section.  Each set of song lyrics were then tokenized by word using the TweetTokenizer model from NLTK.  We chose this tokenizer over NLTK's default tokenizer because it does not split contractions.  We then used stratified sampling to sample 2000 song lyrics from each genre, bringing the total sample size to 20000 lyrics.  
