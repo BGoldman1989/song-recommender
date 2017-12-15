@@ -86,14 +86,14 @@ To design and evaluate our model, we used a publically available list of lyrics 
 
 \section{Related Work}
 \subsection{Emotion in Music Recommender Systems}
-Music recommender systems are a challenging area of research.  Especially challenging are the goals of recommending music to new users to a music streaming service, predicting which users will enjoy a new song or album when it is added to the streaming library, and the evaluation of the music recommender system. \cite{a1}  Music recommender systems are different than film recommenders in several ways.  Songs are typically shorter than a film, and a listener will often listen to many songs consecutively but only one film at a time.  Also, songs have a high emotionality compared with films in general.  Finally, users are sometimes willing to accept repeated recommendations to songs, but they are less likely to enjoy watching the same film repeatedly.  Music recommenders must respond to users' sporadic inputs of expressing like and dislike for music by playing or skipping songs, and the music recommender must constantly present music that is both novel and sufficiently diverse to attract the listener's continued attention.  User mood, location, and activity often affect the listener's perception of appropriateness for a particular song, and the quality of a music recommender should reflect its ability to respond to the user implicitly.
+Music recommender systems are a challenging area of research.  Especially challenging are the goals of recommending music to new users to a music streaming service, predicting which users will enjoy a new song or album when it is added to the streaming library, and the evaluation of the music recommender system. \cite{a1}  Music recommender systems are different than film recommenders in several ways.  Songs are typically shorter than a film, and a listener will often listen to many songs consecutively but only one film at a time.  Also, songs often have a higher and more consistent emotionality compared with films.  Finally, users are sometimes willing to accept repeated recommendations to songs, but they are less likely to enjoy watching the same film repeatedly.  Music recommenders must respond to users' sporadic inputs of expressing like and dislike for music by playing or skipping songs, and the music recommender must constantly present music that is both novel and sufficiently diverse to attract the listener's continued attention.  User mood, location, and activity often affect the listener's perception of appropriateness for a particular song, and the quality of a music recommender should reflect its ability to respond to the user implicitly.
 
 Recent work has explored techniques to include musical emotion as a factor in recommender systems.  Musical key, tempo, and melody characterize emotional features of music.  Film music, which closely follows the dialogue in the film, reflects the emotion of the scene.  Previous work has demonstrated a technique to learn the musical features that reflect the emotions communicated in film text and apply those features to other music. \cite{a2}  Other research used machine learning to discover correlations between musical lyrics and emotions. \cite{a3}  A psychological linguistic dictionary assisted the machine learning algorithm in discovering the emotional connotation of English words.  This approach differs from others in that it extracts emotions from text using an expert-defined psychological linguistic model rather than syntactical text analysis.
 
 \subsection{Word2Vec and Doc2vec}
-The Word2vec algorithm discovers semantic analysis tool for discovering relationships between words.  It converts words and word contexts into vectors \cite{a4,a5,a6}, and the vectors resemble a shallow neural network, the smaller number of features compared with a neural network allows Word2vec to require less memory and computational power than a neural network.  To create the context for each word, Word2vec uses either a continuous bag-of-words (CBOW) or skip-gram model.  The CBOW model is suitable for predicting a central word based on its context of words, and the skip-gram is optimal for predicting a context of words based on a central word.   Word vector representations can also be added or subtracted together to combine different concepts.  For example, the vector representations for king, man, and queen hold that king - man = queen.
+The Word2vec algorithm is a useful semantic analysis tool for discovering relationships between words.  It converts words and word contexts into vectors \cite{a4,a5,a6}, in which a neural network with merely a single-hidden-layer creates an output of an equivalent dimension (in our case, 300 dimensions). The smaller number of features compared with a deep neural network allows Word2vec to require less memory and computational power than that of a deep neural network.  To create the context for each word, Word2vec uses either a continuous bag-of-words (CBOW) or skip-gram model.  The CBOW model is suitable for predicting a central word based on its context of words, and the skip-gram is optimal for predicting a context of words based on a central word.   Word vector representations can also be added or subtracted together to combine different concepts.  For example, the vector representations for king, man, and queen hold that king - man = queen.
 
-Doc2vec is an extension of Word2vec to utilize an entire paragraph or document as the context window for each word. \cite{a7,a8}  Doc2vec predicts words in a document context based on a word.  Doc2vec has a lower error rate than Word2vec does in some cases.
+Doc2vec is an extension of Word2vec to utilize an entire paragraph or document as the context window for each word. \cite{a7,a8}  Doc2vec predicts words in a document context based on a word.  Doc2vec has a lower error rate than Word2vec does in some cases.  Doc2vec, like Word2vec, will use a CBOW or skip-gram approach to creating the vectors.  However, there is also a simple bag-of-words (BOW) approach to Doc2Vec that is merely an average of the Word2vec vectors taken from words in a given document. This approach is more appropriate when the relative distance between words in a document are irrelevant to solving the problem of interest. 
 
 \subsection{Other Approaches}
 Word2vec is a distributional approach to word representations using the values in the vectors that correspond to the distribution of the probability that two words appear in the same context.  An alternative to the distributional approach is the counting approach, which creates a sparse matrix showing how many times each word appears in the context of every other word in the corpus.  The counting approach requires more memory than the distributional approach because it uses a large sparse matrix.  Initial results with Word2vec and Doc2vec showed that their performance was better than the older counting approaches like Latent Semantic Analysis (LSA), but recent work indicates that LSA may be more effective than Word2vec on small corpora. \cite{a10}  Small corpora also require smaller co-occurrence matrices, which makes LSA still more attractive in such scenarios.  Other work suggests that parameter tuning can reduce or eliminate any performance differences between different analysis techniques. \cite{a11}
@@ -122,7 +122,7 @@ Sad & Sad \\
 
 \subsection{Preprocessing}
 
-Song lyric records from the MetroLyrics dataset were first filtered to remove songs with an empty genre attribute or genres labeled "Not Available" or "Other" as well as an empty lyrics section.  Each set of song lyrics were then tokenized by word using the TweetTokenizer model from NLTK.  We chose this tokenizer over NLTK's default tokenizer because it does not split contractions.  We then used stratified sampling to sample 2000 song lyrics from each genre, bringing the total sample size to 20000 lyrics.  
+Song lyric records from the MetroLyrics dataset were first filtered to remove songs with an empty genre attribute or genres labeled "Not Available" or "Other" as well as an empty lyrics section.  Each set of song lyrics were then tokenized by word using the TweetTokenizer model from NLTK.  We chose this tokenizer over NLTK's default tokenizer because it does not split contractions.  We then further filtered songs that contained fewer than 20 tokens.  Lastly, we then used stratified sampling to sample 2000 song lyrics from each genre, bringing the total sample size to 20000 lyrics.  
 
 \subsection{Doc2Vec Generation}
 
@@ -130,50 +130,55 @@ We first selected seed words for each of the emotional categories we chose for u
 
 To generate the word lists, we used a pre-trained Word2Vec model taken from the Google News dataset, which contains a 300-dimensional vector representation of 3 million different words and phrases \cite{a6}.  For each emotional category, we generated a list of 50 most similar words based on cosine similarity using the seed words of the emotional category as positive examples and the seed words of its opposite emotional category as negative examples.  We used Gensim's \texttt{most\_similar()} function to perform this task.  We subsequently used the word vectors of the similar words to create corresponding Doc2Vecs for each emotional category.
 
-Because we do not care about the position of each word relative to one another in the collection of related words to an emotion category, we simply take the bag-of-words approach to our Doc2Vec design by creating an averaged vector for all word2vec occurrences in the document.  We use this approach both for creating vectors for the emotion categories and each song lyric.
+Because we do not care about the position of each word relative to one another in the collection of related words to an emotion category, we simply take the bag-of-words approach to our Doc2Vec design by creating an averaged vector for all Word2vec occurrences in the document.  We use this approach both for creating vectors for the emotion categories and each song lyric.
 
 \subsection{Measurement}
 
 After normalizing the vectors for emotional categories and song lyrics, we measured similarity between each song lyric document vector and emotional category vector by use of cosine similarity.
 
 \section{Experimental Results}
-Testing and evaluating our music recommender system was a two-step process. First, the accuracy of the model's song classification was evaluated using human surveys on a small set of test songs. We then ran the algorithm on the entire corpus of song lyrics and displayed the results with histograms to see what insights they might provide on the emotional tendencies of different music genres.
+Testing and evaluating our music recommender system was a two-step process. First, the accuracy of the model's song classification was evaluated using human surveys on a small set of test songs. We then ran pur algorithm on the entire corpus of song lyrics and displayed the results with histograms to see what insights they might provide on the emotional tendencies of different music genres.
 
 \subsection{Song Emotion Evaluation}
+
 \begin{figure*}[!ht]
 \centering
-\includegraphics[width=500pt]{test_cos.png}
-\caption{Figure 1(a): Song cosine similarity to emotion class}
+\includegraphics[width=570pt]{test_cos.png}
+\caption{Song cosine similarity to emotion class}
 \label{fig:digraph}
+\end{figure*}
+\begin{figure*}[!ht]
 \centering
-\includegraphics[width=500pt]{test_vote.png}
-\caption{Figure 1(b): Song emotion classified by Amazon Mechanical Turk survey}
+\includegraphics[width=570pt]{test_vote.png}
+\caption{Song emotion classified by Amazon Mechanical Turk survey}
 \label{fig:digraph}
 \end{figure*}
 
-We used Amazon Mechanical Turk to evaluate our music recommender model's ability to classify the primary emotion conveyed by a song. Using a set of fifteen example songs from across multiple genres, our music recommender algorithm calculated the cosine similarity of each song to the four emotion categories. At the same time, a group of one hundred Turkers reviewed the lyrics of each song without the song title or artist.  The Amazon Turk reviewers selected which of the four emotion classes each song most closely resembled. The results of both tests are shown in figures 1 and 2, respectively. The algorithm achieved an accuracy of .66, ranking the same emotion class identified by the Turkers as having the greatest cosine similarity to the test song in ten out of fifteen instances.  We believe that further work to identify a more specific corpus of words for each emotion may improve the accuracy of our model.  We leave this task to our plans for future work.
+We used Amazon Mechanical Turk to evaluate our music recommender model's ability to classify the primary emotion conveyed by a song. Using a set of fifteen sample songs from across multiple genres, our music recommender algorithm calculated the cosine similarity of each song to the four emotion categories. At the same time, a group of one hundred Turkers reviewed the lyrics of each song without the song title or artist.  The Mechanical Turk reviewers selected which of the four emotion classes each song most closely resembled. The results of both tests are shown in figures 1 and 2, respectively. The algorithm achieved an accuracy of .66, ranking the same emotion class identified by the Turkers as having the greatest cosine similarity to the test song in ten out of fifteen instances.  We believe that further work to identify a more specific corpus of words for each emotion may improve the accuracy of our model.  We leave this task to our plans for future work.
 
 \subsection{Genre Classification}
 \begin{figure}[!hb]
 \centering
 \includegraphics[width=3.125in]{metal_hate.png}
-\caption{Figer 2(a): Distribution of cosine similarites to "Hate" emotion class for the Metal genre}
+\caption{Distribution of cosine similarites to "Hate" emotion class for the Metal genre}
 \label{fig:digraph}
 \end{figure}
 \begin{figure}[!hb]
 \centering
 \includegraphics[width=3.125in]{pop_hate.png}
-\caption{Figure 2(b): Distribution of cosine similarites to "Hate" emotion class for the Pop genre}
+\caption{Distribution of cosine similarites to "Hate" emotion class for the Pop genre}
 \label{fig:digraph}
 \end{figure}
 Using the song lyric corpus obtained from Kaggle \cite{a14}, we selected the emotion of two thousand songs from each of ten musical genres. We ran the songs through our algorithm to calculate their cosine similarity to each list of emotional words. Using these cosine similarities, we created four histograms for each genre, showing the distribution of similarities across each of the four types of emotion. Above all, the graphs show that songs within any given genre vary widely in regards to which emotion they portray. For some genres, the cosine similarities of songs to emotions are evenly distributed across all four types of emotion.  For other genres, different songs have widely different cosine similarities for a given type of emotion.
 
 Some of the histograms give insight into overall trends within a genre. One such trend can be seen in figures 3 and 4. The histograms clearly show that the Metal genre trends towards the hate/anger emotion, while at the same time, Pop songs tend to have a low cosine similarity to the hate/anger emotion. While emotional trends within broadly defined genres are limited due to the wide variety of songs within such genres, the set of histograms produced by our music recommender system provides insight into how various genres relate to different emotions.  A genre's songs may therefore be either split, evenly spread, similar, or dissimilar to particular emotions. The full set of forty histograms, ten genres each with four emotion classes, can be accessed on our project's github page at \url{https://github.com/BGoldman1989/song-recommender/}.
 
+A couple of factors come to mind that potentially hindered our accuracy.  The first is that we made use of a pre-trained Word2vec model based on news articles instead of training our own with our lyrics dataset.  News articles tend to be written more formally and thus are more likely to be emotionally neutral and less likely to contain slang words seen in a number of song lyrics.  The other significant factor that impaired our accuracy is the fact that we did not take into account negative examples when measuring cosine similarity between song lyrics and the emotional category vectors.  This is possibly why many songs in figure 1 have comparable cosine similarity values for opposite emotional categories.  In future work, we will address these issues to see if they improve our accuracy.
+
 \section{Conclusion and Future Work}
 Music recommender systems make listening to streaming music easier by automatically generating playlist for listeners based on their own listening history or the histories of other listeners.  While many music recommenders use historical listening patterns to generate playlists, we have proposed a music recommender system that uses emotional keywords to discover correlation between songs to generate playlists.  We expect that emotional playlists will improve the listener experience by including songs that feature emotions similar to what the listener wants to hear at any given moment.  Our algorithm generated lists of words that are closely associated with each emotional keyword, but we discovered that the lists of emotional words included songs that were both positively and negatively associated with each income.
 
-In future work, we plan to further refine our algorithm by implementing techniques for excluding songs that exhibit an emotion that is the opposite of what the user wants to hear.  We plan to explore the benefit of using latent semantic analysis to discover correlations between lists of emotional works and individual songs.  We also hope to write and submit a conference paper detailing our algorithm and our experimental results.
+In future work, we plan to further refine our algorithm by implementing techniques that exclude songs exhibiting an emotion that is the opposite of what the user wants to hear and using a Word2vec model trained on the MetroLyrics dataset.  We plan to explore the benefit of using latent semantic analysis to discover correlations between lists of emotional works and individual songs.  We also hope to write and submit a conference paper detailing our algorithm and our experimental results.
 
 
 \bibliographystyle{abbrv}
