@@ -105,7 +105,7 @@ Word2vec is a distributional approach to word representations using the values i
 \begin{center}
  \begin{tabular}{ | c | c | } 
  \hline
-\textbf{Emotion} & \textbf{Associated Works} \\ [0.5ex] 
+\textbf{Emotion} & \textbf{Associated Words} \\ [0.5ex] 
  \hline
 Love & Love, Lust \\ 
  \hline
@@ -122,15 +122,14 @@ Sad & Sad \\
 
 \subsection{Preprocessing}
 
-Song lyric records from the MetroLyrics dataset were first filtered to remove songs with an empty genre attribute or genres labeled "Not Available" or "Other" as well as an empty lyrics section.  Each set of song lyrics were then tokenized by word using the TweetTokenizer model from NLTK.  We chose this tokenizer over NLTK's default tokenizer because it does not split contractions.  We then further filtered songs that contained fewer than 20 tokens.  Lastly, we then used stratified sampling to sample 2000 song lyrics from each genre, bringing the total sample size to 20000 lyrics.  
+Song lyric records from the MetroLyrics dataset were first filtered to remove songs with an empty genre attribute or genres labeled "Not Available" or "Other" as well as an empty lyrics section.  Each set of song lyrics was then tokenized by word using the TweetTokenizer model from NLTK.  We chose this tokenizer over NLTK's default tokenizer because it does not split contractions.  We then further filtered songs that contained fewer than 20 tokens.  Lastly, we used stratified sampling to sample 2,000 song lyrics from each genre, bringing the total sample size to 20,000 lyrics.  
 
 \subsection{Doc2Vec Generation}
+We first selected seed words for each of the emotional categories we chose for use in generating a list of the 50 most similar words for each category (Table 1).  We chose these emotional categories because each one has a distinct and clear opposite that we can use as negative examples.  The seed words were chosen in order to minimize the appearance of noise within the generated similar word list.
 
-We first selected seed words for each of the emotional categories we chose for use in generating a list of 50 most similar wordsfor each category (Table 1).  We chose these emotional categories because each one has a distinct, respective opposite that we can use as negative examples.  The seed words were chosen based on minimizing the appearance of noise within the generated similar word list.
+To generate the word lists, we used a pre-trained Word2Vec model taken from the Google News dataset, which contains a 300-dimensional vector representation of 3 million different words and phrases \cite{a17}.  For each emotional category, we generated a list of the 50 most similar words based on cosine similarity using the seed words of the emotional category as positive examples and the seed words of its opposite emotional category as negative examples.  We used Gensim's \texttt{most\_similar()} function to perform this task.  We subsequently used the word vectors of the similar words to create corresponding Doc2Vecs for each emotional category.
 
-To generate the word lists, we used a pre-trained Word2Vec model taken from the Google News dataset, which contains a 300-dimensional vector representation of 3 million different words and phrases \cite{a6}.  For each emotional category, we generated a list of 50 most similar words based on cosine similarity using the seed words of the emotional category as positive examples and the seed words of its opposite emotional category as negative examples.  We used Gensim's \texttt{most\_similar()} function to perform this task.  We subsequently used the word vectors of the similar words to create corresponding Doc2Vecs for each emotional category.
-
-Because we do not care about the position of each word relative to one another in the collection of related words to an emotion category, we simply take the bag-of-words approach to our Doc2Vec design by creating an averaged vector for all Word2vec occurrences in the document.  We use this approach both for creating vectors for the emotion categories and each song lyric.
+Because our model does not consider the position of each word relative to the others in the collection of words related to an emotion category, we simply take the bag-of-words approach to our Doc2Vec design by creating an averaged vector for all Word2vec occurrences in the document.  We use this approach both for creating vectors for the emotion categories and each song lyric.
 
 \subsection{Measurement}
 
@@ -173,13 +172,15 @@ Using the song lyric corpus obtained from Kaggle \cite{a14}, we selected the emo
 
 Some of the histograms give insight into overall trends within a genre. One such trend can be seen in figures 3 and 4. The histograms clearly show that the Metal genre trends towards the hate/anger emotion, while at the same time, Pop songs tend to have a low cosine similarity to the hate/anger emotion. While emotional trends within broadly defined genres are limited due to the wide variety of songs within such genres, the set of histograms produced by our music recommender system provides insight into how various genres relate to different emotions.  A genre's songs may therefore be either split, evenly spread, similar, or dissimilar to particular emotions. The full set of forty histograms, ten genres each with four emotion classes, can be accessed on our project's github page at \url{https://github.com/BGoldman1989/song-recommender/}.
 
-A couple of factors come to mind that potentially hindered our accuracy.  The first is that we made use of a pre-trained Word2vec model based on news articles instead of training our own with our lyrics dataset.  News articles tend to be written more formally and thus are more likely to be emotionally neutral and less likely to contain slang words seen in a number of song lyrics.  The other significant factor that impaired our accuracy is the fact that we did not take into account negative examples when measuring cosine similarity between song lyrics and the emotional category vectors.  This is possibly why many songs in figure 1 have comparable cosine similarity values for opposite emotional categories.  In future work, we will address these issues to see if they improve our accuracy.
+A couple of factors may potentially hinder the accuracy of our model.  The first is that we made use of a pre-trained Word2vec model from Google based on news articles \cite{a17} instead of training our own with our lyrics dataset.  News articles tend to be written more formally and thus are more likely to be emotionally neutral and less likely to contain slang words seen in many song lyrics.  The other significant factor that impaired our accuracy is the fact that we did not take into account negative examples when measuring cosine similarity between song lyrics and the emotional category vectors.  This is possibly why many songs in figure 1 have comparable cosine similarity values for opposite emotional categories.  In future work, we will address these issues to see if they improve our accuracy.
 
 \section{Conclusion and Future Work}
 Music recommender systems make listening to streaming music easier by automatically generating playlist for listeners based on their own listening history or the histories of other listeners.  While many music recommenders use historical listening patterns to generate playlists, we have proposed a music recommender system that uses emotional keywords to discover correlation between songs to generate playlists.  We expect that emotional playlists will improve the listener experience by including songs that feature emotions similar to what the listener wants to hear at any given moment.  Our algorithm generated lists of words that are closely associated with each emotional keyword, but we discovered that the lists of emotional words included songs that were both positively and negatively associated with each income.
 
 In future work, we plan to further refine our algorithm by implementing techniques that exclude songs exhibiting an emotion that is the opposite of what the user wants to hear and using a Word2vec model trained on the MetroLyrics dataset.  We plan to explore the benefit of using latent semantic analysis to discover correlations between lists of emotional works and individual songs.  We also hope to write and submit a conference paper detailing our algorithm and our experimental results.
 
+\section{Contributions}
+Our team members included Brady Goldman, Patrick Coudahy, and James Byron.  Brady and James collaborated on choosing the topic and devising our methodology.  Brady implemented the experiments.  Patrick made the visualizations for the paper and 40 other visualizations available in our Github repository.  James wrote the abstract, introduction, related work, data description, and conclusion sections of the paper.  Brady wrote the implementation section of the paper, and Patrick wrote the exerimental results section.  We all worked together on editing the paper and putting it into Latex.
 
 \bibliographystyle{abbrv}
 \bibliography{references}
