@@ -18,6 +18,7 @@
 \usepackage{epstopdf}
 \usepackage{float}
 \usepackage{listings}
+\usepackage{placeins}
 \usepackage[hyphens]{url}
 
 % subfig default captions are too small.  This fixes it.
@@ -139,28 +140,27 @@ After normalizing the vectors for emotional categories and song lyrics, we measu
 Testing and evaluating our music recommender system was a two-step process. First, the accuracy of the model's song classification was evaluated using human surveys on a small set of test songs. The algorithm was then run on the entire corpus of song lyrics and displayed with histograms to see what insight it might provide on the emotional tendencies of music genres.
 
 \subsection{Song Emotion Evaluation}
-\begin{figure}[!htb]
+\begin{figure*}[!ht]
 \centering
-\includegraphics[width=\textwidth]{test_cos.png}
+\includegraphics[width=500pt]{test_cos.png}
 \caption{Figure 1(a): Song cosine similarity to emotion class}
 \label{fig:digraph}
-\end{figure}
-\begin{figure}[!htb]
 \centering
-\includegraphics[width=\textwidth]{test_vote.png}
+\includegraphics[width=500pt]{test_vote.png}
 \caption{Figure 1(b): Song emotion classified by Amazon Mechanical Turk survey}
 \label{fig:digraph}
-\end{figure}
+\end{figure*}
+
 Amazon Mechanical Turk was used to evaluate our music recommender model's ability to classify the primary emotion displayed by a song. Using a set of fifteen example songs from across multiple genres, our music recommender algorithm was used to calculate the cosine similarity of each song to the four emotion categories. At the same time, a group of one hundred Turkers were given the lyrics of each song without song title or artist and asked to identify which of the four emotion classes it most closely resembled. The results of both tests can be seen in figures 1(a) and 1(b), respectively. The algorithm achieved an accuracy of .66, ranking the same emotion class identified by the Turkers as having the greatest cosine similarity to the test song in ten out of fifteen instances. Were more time and work available to identify a corpus of words that do not pertain to any particular emotion, as such having a similar cosine similarity to all emotion classifications, the accuracy of the model should rise with the removal of noise words.
 
 \subsection{Genre Classification}
-\begin{figure}[!htb]
+\begin{figure}[!hb]
 \centering
 \includegraphics[width=3.125in]{metal_hate.png}
 \caption{Figer 2(a): Distribution of cosine similarites to "Hate" emotion class for the Metal genre}
 \label{fig:digraph}
 \end{figure}
-\begin{figure}[!htb]
+\begin{figure}[!hb]
 \centering
 \includegraphics[width=3.125in]{pop_hate.png}
 \caption{Figure 2(b): Distribution of cosine similarites to "Hate" emotion class for the Pop genre}
