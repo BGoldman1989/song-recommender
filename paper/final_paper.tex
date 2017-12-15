@@ -18,6 +18,7 @@
 \usepackage{epstopdf}
 \usepackage{float}
 \usepackage{listings}
+\usepackage{placeins}
 \usepackage[hyphens]{url}
 
 % subfig default captions are too small.  This fixes it.
@@ -139,28 +140,27 @@ After normalizing the vectors for emotional categories and song lyrics, we measu
 Testing and evaluating our music recommender system was a two-step process. First, the accuracy of the model's song classification was evaluated using human surveys on a small set of test songs. We then ran the algorithm on the entire corpus of song lyrics and displayed the results with histograms to see what insights they might provide on the emotional tendencies of different music genres.
 
 \subsection{Song Emotion Evaluation}
-\begin{figure}[!htb]
+\begin{figure*}[!ht]
 \centering
-\includegraphics[width=\textwidth]{test_cos.png}
+\includegraphics[width=500pt]{test_cos.png}
 \caption{Figure 1(a): Song cosine similarity to emotion class}
 \label{fig:digraph}
-\end{figure}
-\begin{figure}[!htb]
 \centering
-\includegraphics[width=\textwidth]{test_vote.png}
+\includegraphics[width=500pt]{test_vote.png}
 \caption{Figure 1(b): Song emotion classified by Amazon Mechanical Turk survey}
 \label{fig:digraph}
-\end{figure}
+\end{figure*}
+
 We used Amazon Mechanical Turk to evaluate our music recommender model's ability to classify the primary emotion conveyed by a song. Using a set of fifteen example songs from across multiple genres, our music recommender algorithm calculated the cosine similarity of each song to the four emotion categories. At the same time, a group of one hundred Turkers reviewed the lyrics of each song without the song title or artist.  The Amazon Turk reviewers selected which of the four emotion classes each song most closely resembled. The results of both tests are shown in figures 1 and 2, respectively. The algorithm achieved an accuracy of .66, ranking the same emotion class identified by the Turkers as having the greatest cosine similarity to the test song in ten out of fifteen instances.  We believe that further work to identify a more specific corpus of words for each emotion may improve the accuracy of our model.  We leave this task to our plans for future work.
 
 \subsection{Genre Classification}
-\begin{figure}[!htb]
+\begin{figure}[!hb]
 \centering
 \includegraphics[width=3.125in]{metal_hate.png}
 \caption{Figer 2(a): Distribution of cosine similarites to "Hate" emotion class for the Metal genre}
 \label{fig:digraph}
 \end{figure}
-\begin{figure}[!htb]
+\begin{figure}[!hb]
 \centering
 \includegraphics[width=3.125in]{pop_hate.png}
 \caption{Figure 2(b): Distribution of cosine similarites to "Hate" emotion class for the Pop genre}
